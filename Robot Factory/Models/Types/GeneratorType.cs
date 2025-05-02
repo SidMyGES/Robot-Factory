@@ -4,5 +4,6 @@ public enum GeneratorType
 {
     Gm1,
     Gd1,
-    Gi1
+    Gi1,
+    All
 }

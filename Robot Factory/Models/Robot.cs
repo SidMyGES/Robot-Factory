@@ -5,7 +5,7 @@ namespace Robot_Factory.Models
 { 
     public class Robot(RobotType type)
     {
-        private RobotType Type { get; } = type;
+        public RobotType Type { get; private set; } = type;
         private Dictionary<Part, bool> _parts = new();
 
     }

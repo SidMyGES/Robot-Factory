@@ -6,6 +6,6 @@ namespace Robot_Factory.Models
 {
     internal class Core(CoreType type) : Part("Core")
     {
-    private CoreType Type { get; } = type;
+    public CoreType Type { get; private set; } = type;
     }
 }

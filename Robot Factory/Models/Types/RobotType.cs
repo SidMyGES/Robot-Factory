@@ -4,5 +4,6 @@ public enum RobotType
 {
     Xm1,
     Rd1,
-    Wi1
+    Wi1,
+    All
 }

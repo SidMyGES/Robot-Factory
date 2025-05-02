@@ -5,6 +5,7 @@ namespace Robot_Factory.Models.Types
     {
         Am1,
         Ad1,
-        Ai1
+        Ai1,
+        All
     }
 }

@@ -9,6 +9,6 @@ namespace Robot_Factory.Models
 {
     internal class Legs(LegsType type): Part("Legs")
     {
-        private LegsType Type { get; } = type;
+        public LegsType Type { get; private set; } = type;
     }
 }

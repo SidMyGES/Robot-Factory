@@ -6,6 +6,6 @@ namespace Robot_Factory.Models
     internal class Generator(GeneratorType type): Part("Generator")
 
     {
-        private GeneratorType Type { get; } = type;
+        public GeneratorType Type { get; private set; } = type;
     }
 }
