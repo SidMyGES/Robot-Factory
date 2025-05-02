@@ -1,10 +1,11 @@
 ﻿
 using System.Security.Cryptography.X509Certificates;
+using Robot_Factory.Models.Types;
 
 namespace Robot_Factory.Models
 {
-    internal class Core(string type) : Part("Core")
+    internal class Core(CoreType type) : Part("Core")
     {
-    private string Type { get; } = type;
+    private CoreType Type { get; } = type;
     }
 }

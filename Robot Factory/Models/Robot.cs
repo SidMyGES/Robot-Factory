@@ -1,11 +1,12 @@
-﻿using Robot_Factory.Models.Types;
+﻿using System.Reflection;
+using Robot_Factory.Models.Types;
 
 namespace Robot_Factory.Models
 { 
-    public class Robot(string name, CoreType model)
+    public class Robot(RobotType type)
     {
-        private string Name { get; } = name;
-        private CoreType Model { get; } = model;
-        //private Dictionary<>
+        private RobotType Type { get; } = type;
+        private Dictionary<Part, bool> _parts = new();
+
     }
 }
