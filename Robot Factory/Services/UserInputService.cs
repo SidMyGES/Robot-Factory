@@ -1,26 +1,32 @@
 ﻿
-namespace Robot_Factory.Services
+using Robot_Factory.Models;
+using Robot_Factory.Models.Types;
+using Robot_Factory.Utils;
+
+namespace Robot_Factory.Services;
+
+internal class UserInputService(InventoryService inventoryService)
 {
-    internal class UserInputService
+    internal void Stocks()
     {
+        EnumUtils.PrintItemsByType<RobotType, Robot> (
+            inventoryService.GetRobotsByType);
 
-        private readonly InventoryService _inventoryService = new();
+        EnumUtils.PrintItemsByType<CoreType, Core>(
+            inventoryService.GetCoresByType);
 
+        EnumUtils.PrintItemsByType<ArmsType, Arms>(
+            inventoryService.GetArmsByType);
 
-        internal void Stocks()
-        {
-            PrintList(_inventoryService.GetRobots());
-            PrintList(_inventoryService.GetCores());
-            PrintList(_inventoryService.GetGenerators());
-            PrintList(_inventoryService.GetArms());
-            PrintList(_inventoryService.GetLegs());
-        }
+        EnumUtils.PrintItemsByType<LegsType, Legs>(
+            inventoryService.GetLegsByType);
 
-
-        private void PrintList<T>(List<T> list)
-        {
-            if (list.Count != 0)
-                Console.WriteLine(list.Count + " " + list.);
-        }
+        EnumUtils.PrintItemsByType<GeneratorType, Generator>(
+            inventoryService.GetGeneratorsByType);
     }
+
+
+
+
+
 }
