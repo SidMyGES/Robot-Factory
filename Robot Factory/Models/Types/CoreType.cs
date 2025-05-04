@@ -13,10 +13,10 @@ internal static class CoreTypeExtension
     {
         return type switch
         {
-            CoreType.Cm1 => "CM1",
-            CoreType.Cd1 => "CD1",
-            CoreType.Ci1 => "CI1",
-            _ => throw new ArgumentOutOfRangeException(nameof(type), type, $"Type {type} is not an available core")
+            CoreType.Cm1 => "Core_CM1",
+            CoreType.Cd1 => "Core_CD1",
+            CoreType.Ci1 => "Core_CI1",
+            _ => throw new ArgumentOutOfRangeException($"Type {type} is not an available core")
         };
     }
 }

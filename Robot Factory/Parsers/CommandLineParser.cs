@@ -1,0 +1,80 @@
+﻿using Robot_Factory.Errors;
+using Robot_Factory.Models.Types;
+using static System.Text.RegularExpressions.Regex;
+
+namespace Robot_Factory.Parsers;
+
+internal static class CommandLineParser
+{
+    private static readonly List<Command> Commands = Enum.GetValues<Command>().ToList();
+
+    public static (Command command, List<Order> orders) Parse(string userInput)
+    {
+        var commandText = ExtractCommandText(userInput.Trim());
+        var command = commandText.ToCommand();
+        var arguments = ExtractArguments(userInput.Trim());
+        return (command, arguments);
+    }
+
+    private static string ExtractCommandText(string userInput)
+    {
+        return Split(userInput, @"(?<=\w)\s+(?=\w)")
+            .First();
+    }
+
+    private static List<Order> ExtractArguments(string userInput)
+    {
+        var arguments = ExtractArgumentsText(userInput);
+        if (string.IsNullOrWhiteSpace(arguments))
+            return [];
+
+        var ordersText = SplitOrders(arguments);
+        try
+        {
+            return ParseOrders(ordersText);
+        }
+        catch (Exception e)
+        {
+            CommandLineError.Display(e.Message);
+            return [];
+        }
+    }
+
+    private static string? ExtractArgumentsText(string userInput)
+    {
+        var orders = Split(userInput, @"(?<=\w)\s+(?=\w)");
+        return orders.Length > 1 ? orders[1].Trim() : null;
+    }
+
+    private static List<string> SplitOrders(string arguments)
+    {
+        return Split(arguments, @"(?<=[a-zA-Z]),(?=\s*[a-zA-Z])").ToList();
+    }
+
+    private static List<Order> ParseOrders(List<string> ordersText)
+    {
+
+        var parseOrder = new Func<string, Order>(orderText =>
+        {
+            var parts = orderText.Split(" ");
+            return new Order(
+                int.Parse(parts[0]),
+                parts[1].ToRobotType()
+            );
+        });
+
+        var mergeOrdersByType = new Func<IGrouping<RobotType, Order>, Order>(group =>
+        {
+            return new Order(
+                group.Sum(order => order.Quantity), 
+                group.Key);
+        });
+
+
+        return ordersText
+            .Select(parseOrder)
+            .GroupBy(order => order.RobotType)
+            .Select(mergeOrdersByType)
+            .ToList();
+    }
+}

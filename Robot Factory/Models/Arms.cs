@@ -2,12 +2,12 @@
 
 namespace Robot_Factory.Models;
 
-internal class Arms (ArmsType type) : Part("Arms")
+internal class Arms (ArmType type)
 {
-    public ArmsType Type { get; private set; } = type;
+    public ArmType Type { get; private set; } = type;
 
     public override string ToString()
     {
-        return Name + "_" + Type.Stringify();
+        return Type.Stringify();
     }
 }

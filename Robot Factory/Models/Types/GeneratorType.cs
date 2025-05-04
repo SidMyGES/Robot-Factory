@@ -13,10 +13,10 @@ internal static class GeneratorTypeExtension
     {
         return type switch
         {
-            GeneratorType.Gm1 => "GM1",
-            GeneratorType.Gd1 => "GD1",
-            GeneratorType.Gi1 => "GI1",
-            _ => throw new ArgumentOutOfRangeException(nameof(type), type, $"Type {type} is not an available Generator")
+            GeneratorType.Gm1 => "Generator_GM1",
+            GeneratorType.Gd1 => "Generator_GD1",
+            GeneratorType.Gi1 => "Generator_GI1",
+            _ => throw new ArgumentOutOfRangeException($"Type {type} is not an available Generator")
         };
     }
 }

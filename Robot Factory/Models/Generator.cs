@@ -2,12 +2,12 @@
 
 namespace Robot_Factory.Models;
 
-internal class Generator(GeneratorType type): Part("Generator")
+internal class Generator(GeneratorType type)
 {
     public GeneratorType Type { get; private set; } = type;
 
     public override string ToString()
     {
-        return Name + "_" + Type.Stringify();
+        return Type.Stringify();
     }
 }

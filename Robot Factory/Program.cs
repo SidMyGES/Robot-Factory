@@ -8,12 +8,19 @@ internal class Program
 {
     public static void Main(string[] args)
     {
-        InventoryService inventoryService = new();
+        var inventoryService = new InventoryService();
         FillData(inventoryService);
+        var orders = new List<Order>
+        {
+            new(3, RobotType.Xm1),
+            new(3, RobotType.Rd1),
+            new(1, RobotType.Wi1)
+        };
 
-        var userInputService = new UserInputService(inventoryService);
+        var userInputService = new CommandService(inventoryService);
 
-        userInputService.Stocks();
+        //userInputService.Stocks();
+        //userInputService.NeededStocks(orders);
         Console.ReadLine();
 
     }
@@ -41,13 +48,13 @@ internal class Program
                 type => new Core(type),
                 inventoryService.AddCore);
 
-            AddItem<ArmsType, Arms>(
+            AddItem<ArmType, Arms>(
                 type => new Arms(type),
                 inventoryService.AddArms);
 
-            //AddItem<LegsType, Legs>(
-            //    type => new Legs(type),
-            //    inventoryService.AddLegs);
+            AddItem<LegType, Legs>(
+                type => new Legs(type),
+                inventoryService.AddLegs);
 
             AddItem<GeneratorType, Generator>(
                 type => new Generator(type),

@@ -2,12 +2,12 @@
 
 namespace Robot_Factory.Models;
 
-internal class Legs(LegsType type): Part("Legs")
+internal class Legs(LegType type)
 {
-    public LegsType Type { get; private set; } = type;
+    public LegType Type { get; private set; } = type;
 
     public override string ToString()
     {
-        return Name + "_" + Type.Stringify();
+        return Type.Stringify();
     }
 }

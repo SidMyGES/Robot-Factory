@@ -14,12 +14,12 @@ internal class InventoryService
         return _inventory.CoreInventory.Where(core => core.Type == type).ToList();
     }
 
-    public List<Arms> GetArmsByType(ArmsType type)
+    public List<Arms> GetArmsByType(ArmType type)
     {
         return _inventory.ArmsInventory.Where(arm => arm.Type == type).ToList();
     }
 
-    public List<Legs> GetLegsByType(LegsType type)
+    public List<Legs> GetLegsByType(LegType type)
     {
         return _inventory.LegsInventory.Where(leg => leg.Type == type).ToList();
     }

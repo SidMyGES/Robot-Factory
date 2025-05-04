@@ -2,12 +2,12 @@
 
 namespace Robot_Factory.Models;
 
-internal class Core(CoreType type) : Part("Core")
+internal class Core(CoreType type)
 {
     public CoreType Type { get; private set; } = type;
 
     public override string ToString()
     {
-        return Name + "_" + Type.Stringify();
+        return Type.Stringify();
     }
 }
