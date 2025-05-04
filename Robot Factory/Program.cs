@@ -1,5 +1,6 @@
 ﻿using Robot_Factory.Models;
 using Robot_Factory.Models.Types;
+using Robot_Factory.Parsers;
 using Robot_Factory.Services;
 
 namespace Robot_Factory;
@@ -10,11 +11,25 @@ internal class Program
     {
         var inventoryService = new InventoryService();
         FillData(inventoryService);
-
-
         var commandService = new CommandService(inventoryService);
+        CommandDispatcher.Initialize(commandService);
 
+        RunCommandLoop();
+    }
 
+    public static void RunCommandLoop()
+    {
+        while (true)
+        {
+            Console.WriteLine("Enter a command (STOCKS, INSTRUCTIONS, NEEDED_STOCKS, VERIFY, PRODUCE, EXIT):");
+            var userInput = Console.ReadLine()?.Trim();
+
+            if (userInput?.ToUpper() == "EXIT")
+                break;
+
+            var parsed = CommandLineParser.Parse(userInput ?? "");
+            CommandDispatcher.Dispatch(parsed);
+        }
     }
 
     public static void AddItem<TEnum, TItem>(Func<TEnum,TItem> createItem, 
@@ -30,7 +45,7 @@ internal class Program
 
     public static void FillData(InventoryService inventoryService)
     {
-        foreach (var _ in Enumerable.Range(1, 12))
+        foreach (var _ in Enumerable.Range(1, 200))
         {
             AddItem<RobotType, Robot>(
                 type => new Robot(type),

@@ -42,13 +42,20 @@ internal static class CommandLineParser
 
     private static string? ExtractArgumentsText(string userInput)
     {
-        var orders = Split(userInput, @"(?<=\w)\s+(?=\w)");
-        return orders.Length > 1 ? orders[1].Trim() : null;
+        var firstSpaceIndex = userInput.IndexOf(' ');
+
+        if (firstSpaceIndex == -1 || firstSpaceIndex == userInput.Length - 1)
+            return null;
+
+        return userInput[(firstSpaceIndex + 1)..].Trim();
     }
 
     private static List<string> SplitOrders(string arguments)
     {
-        return Split(arguments, @"(?<=[a-zA-Z]),(?=\s*[a-zA-Z])").ToList();
+        var orders = Split(arguments, @"(?<=\w),(?=\s*\w)").ToList();
+        return orders.Select(order =>
+            !string.IsNullOrEmpty(order) && order[^1] == ',' ? order[..^1] : order
+        ).Select(order => order.Trim()).ToList(); ;
     }
 
     private static List<Order> ParseOrders(List<string> ordersText)

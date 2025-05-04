@@ -84,7 +84,7 @@ internal class CommandService(InventoryService inventoryService)
             var robotType = order.RobotType;
             var quantity = order.Quantity;
 
-            foreach (var index in Enumerable.Range(1, quantity + 1))
+            foreach (var index in Enumerable.Range(1, quantity))
             {
                 var robot = new Robot(robotType);
                 DisplayUtils.PrintStep($"{ProductionStep.Producing.Stringify()}", robotType.Stringify() + " :");
@@ -196,7 +196,7 @@ internal class CommandService(InventoryService inventoryService)
             var robotType = order.RobotType;
             var quantity = order.Quantity;
 
-            foreach (var index in Enumerable.Range(1, quantity + 1))
+            foreach (var index in Enumerable.Range(1, quantity))
             {
                 var robot = new Robot(robotType);
 
