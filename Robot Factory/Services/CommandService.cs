@@ -1,4 +1,5 @@
 ﻿
+using System.Security.AccessControl;
 using Robot_Factory.Errors;
 using Robot_Factory.Models;
 using Robot_Factory.Models.Types;
@@ -29,6 +30,12 @@ internal class CommandService(InventoryService inventoryService)
     internal void NeededStocks(List<Order> orders)
     {
         var totalParts = new Dictionary<string, int>();
+
+        if (orders.Count == 0)
+        {
+            CommandLineError.Display("No orders to process");
+            return;
+        }
 
         foreach (var order in orders)
         {
@@ -65,6 +72,13 @@ internal class CommandService(InventoryService inventoryService)
 
     internal void Instructions(List<Order> orders)
     {
+
+        if (orders.Count == 0)
+        {
+            CommandLineError.Display("No orders to process");
+            return;
+        }
+
         orders.ForEach(order =>
         {
             var robotType = order.RobotType;
@@ -121,6 +135,108 @@ internal class CommandService(InventoryService inventoryService)
         });
     }
 
+    internal bool Verify(List<Order> orders)
+    {
+        var totalParts = new Dictionary<Enum, int>();
+
+        if (orders.Count == 0)
+        {
+            CommandLineError.Display("No orders to process");
+            return false;
+        }
+
+        foreach (var order in orders)
+        {
+            var robotType = order.RobotType;
+            var robotQuantity = order.Quantity;
+
+            var core = robotType.GetCompatibleCore();
+            AddPart(core.Type, robotQuantity * core.Quantity, totalParts);
+
+            var generator = robotType.GetCompatibleGenerator();
+            AddPart(generator.Type, robotQuantity * generator.Quantity, totalParts);
+
+            var arms = robotType.GetCompatibleArms();
+            AddPart(arms.Type, robotQuantity * arms.Quantity, totalParts);
+
+            var legs = robotType.GetCompatibleLegs();
+            AddPart(legs.Type, robotQuantity * legs.Quantity, totalParts);
+        }
+
+        foreach (var (key, required) in totalParts)
+        {
+            var available = key switch
+            {
+                CoreType coreType => inventoryService.GetCoresByType(coreType).Count,
+                GeneratorType generatorType => inventoryService.GetGeneratorsByType(generatorType).Count,
+                ArmsType armType => inventoryService.GetArmsByType(armType).Count,
+                LegsType legType => inventoryService.GetLegsByType(legType).Count,
+                _ => throw new InvalidOperationException($"Unsupported part type: {key}")
+            };
+
+            if (available < required){
+                DisplayUtils.PrintStatus(Status.Unavailable.Stringify());
+                return false;
+            }
+        }
+        DisplayUtils.PrintStatus(Status.Available.Stringify());
+        return true;
+    }
+
+    internal void Produce(List<Order> orders)
+    {
+        if (!Verify(orders))
+        {
+            CommandLineError.Display("Stock is not enough for production");
+            return;
+        }
+
+        orders.ForEach(order =>
+        {
+            var robotType = order.RobotType;
+            var quantity = order.Quantity;
+
+            foreach (var index in Enumerable.Range(1, quantity + 1))
+            {
+                var robot = new Robot(robotType);
+
+                var compatibleCore = robotType.GetCompatibleCore();
+                var core = GetOutStock(compatibleCore.Type, inventoryService.PopCoreByType);
+                var supportedSystem = core.Type.GetSupportedSystems().First();
+                Install(supportedSystem, core);
+                robot.SetCore(core);
+
+                var compatibleGenerator = robotType.GetCompatibleGenerator();
+                var generator = GetOutStock(compatibleGenerator.Type, inventoryService.PopGeneratorByType);
+
+                var name = "TMP" + (inventoryService.GetAssemblies().Count + 1);
+                var assembly = Assemble(name, generator, core);
+                inventoryService.AddAssembly(assembly);
+                robot.SetGenerator(generator);
+
+                var compatibleArms = robotType.GetCompatibleArms();
+                var arms = GetOutStock(compatibleArms.Type, inventoryService.PopArmsByType);
+
+                name = "TMP" + (inventoryService.GetAssemblies().Count + 1);
+                assembly = Assemble(name, assembly, arms);
+                inventoryService.AddAssembly(assembly);
+                robot.SetArms(arms);
+
+                var compatibleLegs = robotType.GetCompatibleLegs();
+                var legs = GetOutStock(compatibleLegs.Type, inventoryService.PopLegsByType);
+
+                name = "TMP" + (inventoryService.GetAssemblies().Count + 1);
+                assembly = Assemble(name, assembly, legs);
+                inventoryService.AddAssembly(assembly);
+                robot.SetLegs(legs);
+
+                inventoryService.AddRobot(robot);
+            }
+        });
+
+        DisplayUtils.PrintStatus(Status.StockUpdated.Stringify());
+    }
+
     private void AddPart(string key, int value, Dictionary<string, int> map)
     {
         if(!map.TryAdd(key, value))
@@ -128,6 +244,15 @@ internal class CommandService(InventoryService inventoryService)
             map[key] += value;
         }
     }
+
+    private void AddPart(Enum key, int value, Dictionary<Enum, int> map)
+    {
+        if (!map.TryAdd(key, value))
+        {
+            map[key] += value;
+        }
+    }
+
 
     private void Install(CoreSystem coreSystem, Core core)
     {

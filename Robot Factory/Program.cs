@@ -10,19 +10,10 @@ internal class Program
     {
         var inventoryService = new InventoryService();
         FillData(inventoryService);
-        var orders = new List<Order>
-        {
-            new(3, RobotType.Xm1),
-            new(3, RobotType.Rd1),
-            new(1, RobotType.Wi1)
-        };
 
-        var userInputService = new CommandService(inventoryService);
 
-        //userInputService.Stocks();
-        //userInputService.NeededStocks(orders);
-        //userInputService.Instructions(orders);
-        Console.ReadLine();
+        var commandService = new CommandService(inventoryService);
+
 
     }
 
@@ -39,7 +30,7 @@ internal class Program
 
     public static void FillData(InventoryService inventoryService)
     {
-        foreach (var _ in Enumerable.Range(1, 15))
+        foreach (var _ in Enumerable.Range(1, 12))
         {
             AddItem<RobotType, Robot>(
                 type => new Robot(type),

@@ -19,4 +19,15 @@ internal static class GeneratorTypeExtension
             _ => throw new ArgumentOutOfRangeException($"Type {type} is not an available Generator")
         };
     }
+
+    public static GeneratorType ToGeneratorType(this string type)
+    {
+        return type switch
+        {
+            "Generator_GM1" => GeneratorType.Gm1,
+            "Generator_GD1" => GeneratorType.Gd1,
+            "Generator_GI1" => GeneratorType.Gi1,
+            _ => throw new ArgumentException($"{type} is not a valid type of generator")
+        };
+    }
 }

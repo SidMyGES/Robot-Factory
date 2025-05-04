@@ -5,6 +5,13 @@ namespace Robot_Factory.Utils;
 internal static class DisplayUtils
 {
 
+    public static void PrintStatus (string status)
+    {
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine(status);
+        Console.ResetColor();
+    }
+
     public static void PrintStep(string step, List<string> args)
     {
         Console.ForegroundColor = ConsoleColor.Green;

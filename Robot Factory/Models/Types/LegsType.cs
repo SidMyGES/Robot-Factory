@@ -19,4 +19,15 @@ internal static class LegsTypeExtension
             _ => throw new ArgumentOutOfRangeException($"Type {type} is not an available Legs")
         };
     }
+
+    public static LegsType ToLegsType(this string type)
+    {
+        return type switch
+        {
+            "Legs_LM1" => LegsType.Lm1,
+            "Legs_LD1" => LegsType.Ld1,
+            "Legs_LI1" => LegsType.Li1,
+            _ => throw new ArgumentException($"{type} is not a valid type of legs")
+        };
+    }
 }

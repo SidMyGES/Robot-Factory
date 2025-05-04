@@ -20,4 +20,15 @@ internal static class ArmsTypeExtension
             _ => throw new ArgumentOutOfRangeException($"Type {type} is not an available Arms")
         };
     }
+
+    public static ArmsType ToArmsType(this string type)
+    {
+        return type switch
+        {
+            "Arms_AM1" => ArmsType.Am1,
+            "Arms_AD1" => ArmsType.Ad1,
+            "Arms_AI1" => ArmsType.Ai1,
+            _ => throw new ArgumentException($"{type} is not a valid type of arms")
+        };
+    }
 }
