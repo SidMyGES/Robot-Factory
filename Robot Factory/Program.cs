@@ -21,6 +21,7 @@ internal class Program
 
         //userInputService.Stocks();
         //userInputService.NeededStocks(orders);
+        //userInputService.Instructions(orders);
         Console.ReadLine();
 
     }
@@ -38,7 +39,7 @@ internal class Program
 
     public static void FillData(InventoryService inventoryService)
     {
-        foreach (var _ in Enumerable.Range(1, 5))
+        foreach (var _ in Enumerable.Range(1, 15))
         {
             AddItem<RobotType, Robot>(
                 type => new Robot(type),
@@ -48,11 +49,11 @@ internal class Program
                 type => new Core(type),
                 inventoryService.AddCore);
 
-            AddItem<ArmType, Arms>(
+            AddItem<ArmsType, Arms>(
                 type => new Arms(type),
                 inventoryService.AddArms);
 
-            AddItem<LegType, Legs>(
+            AddItem<LegsType, Legs>(
                 type => new Legs(type),
                 inventoryService.AddLegs);
 

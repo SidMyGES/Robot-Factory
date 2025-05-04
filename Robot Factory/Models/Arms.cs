@@ -2,9 +2,9 @@
 
 namespace Robot_Factory.Models;
 
-internal class Arms (ArmType type)
+internal class Arms(ArmsType type):IPart<ArmsType>
 {
-    public ArmType Type { get; private set; } = type;
+    public ArmsType Type { get; private set; } = type;
 
     public override string ToString()
     {

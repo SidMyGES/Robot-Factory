@@ -23,6 +23,9 @@ internal static class CommandDispatcher
             case Command.NeededStocks:
                 _commandService.NeededStocks(input.orders);
                 break;
+            case Command.Instructions:
+                _commandService.Instructions(input.orders);
+                break;
             case Command.Error:
                 CommandLineError.Display("The command entered is not valid");
                 break;

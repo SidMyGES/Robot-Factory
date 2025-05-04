@@ -2,9 +2,9 @@
 
 namespace Robot_Factory.Models;
 
-internal class Legs(LegType type)
+internal class Legs(LegsType type): IPart<LegsType>
 {
-    public LegType Type { get; private set; } = type;
+    public LegsType Type { get; private set; } = type;
 
     public override string ToString()
     {

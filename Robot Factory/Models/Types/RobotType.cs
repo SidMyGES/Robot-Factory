@@ -56,25 +56,25 @@ internal static class RobotTypeExtension
     }
 
 
-    public static PartInfo<ArmType> GetCompatibleArms(this RobotType type)
+    public static PartInfo<ArmsType> GetCompatibleArms(this RobotType type)
     {
         return type switch
         {
-            RobotType.Xm1 => new PartInfo<ArmType>(ArmType.Am1, 2),
-            RobotType.Rd1 => new PartInfo<ArmType>(ArmType.Ad1, 2),
-            RobotType.Wi1 => new PartInfo<ArmType>(ArmType.Ai1, 2),
+            RobotType.Xm1 => new PartInfo<ArmsType>(ArmsType.Am1, 1),
+            RobotType.Rd1 => new PartInfo<ArmsType>(ArmsType.Ad1, 1),
+            RobotType.Wi1 => new PartInfo<ArmsType>(ArmsType.Ai1, 1),
             _ => throw new ArgumentOutOfRangeException($"{type} is not a declared robot type")
         };
     }
 
 
-    public static PartInfo<LegType> GetCompatibleLegs(this RobotType type)
+    public static PartInfo<LegsType> GetCompatibleLegs(this RobotType type)
     {
         return type switch
         {
-            RobotType.Xm1 => new PartInfo<LegType>(LegType.Lm1, 2),
-            RobotType.Rd1 => new PartInfo<LegType>(LegType.Ld1, 2),
-            RobotType.Wi1 => new PartInfo<LegType>(LegType.Li1, 2),
+            RobotType.Xm1 => new PartInfo<LegsType>(LegsType.Lm1, 1),
+            RobotType.Rd1 => new PartInfo<LegsType>(LegsType.Ld1, 1),
+            RobotType.Wi1 => new PartInfo<LegsType>(LegsType.Li1, 1),
             _ => throw new ArgumentOutOfRangeException($"{type} is not a declared robot type")
         };
     }

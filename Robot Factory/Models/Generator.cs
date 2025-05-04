@@ -2,7 +2,7 @@
 
 namespace Robot_Factory.Models;
 
-internal class Generator(GeneratorType type)
+internal class Generator(GeneratorType type): IPart<GeneratorType>
 {
     public GeneratorType Type { get; private set; } = type;
 
@@ -10,4 +10,5 @@ internal class Generator(GeneratorType type)
     {
         return Type.Stringify();
     }
+
 }

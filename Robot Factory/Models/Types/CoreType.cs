@@ -19,4 +19,15 @@ internal static class CoreTypeExtension
             _ => throw new ArgumentOutOfRangeException($"Type {type} is not an available core")
         };
     }
+
+    public static List<CoreSystem> GetSupportedSystems(this CoreType type)
+    {
+        return type switch
+        {
+            CoreType.Cm1 => [CoreSystem.Sb1],
+            CoreType.Cd1 => [CoreSystem.Sb1],
+            CoreType.Ci1 => [CoreSystem.Sb1],
+            _ => throw new ArgumentOutOfRangeException($"Type {type} is not an available core")
+        };
+    }
 }
