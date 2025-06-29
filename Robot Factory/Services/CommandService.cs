@@ -1,5 +1,4 @@
 ﻿
-using System.Security.AccessControl;
 using Robot_Factory.Errors;
 using Robot_Factory.Models;
 using Robot_Factory.Models.Types;
@@ -44,7 +43,7 @@ internal class CommandService(InventoryService inventoryService)
 
             DisplayUtils.Print(robotType.Stringify() + " :", robotQuantity);
 
-            var core = robotType.GetCompatibleCore();
+            var core = robotType.GetCompatibleCoreType();
             DisplayUtils.Print(core.Type.Stringify(), robotQuantity * core.Quantity);
             AddPart(core.Type.Stringify(), robotQuantity * core.Quantity, totalParts);
 
@@ -89,51 +88,68 @@ internal class CommandService(InventoryService inventoryService)
                 var robot = new Robot(robotType);
                 DisplayUtils.PrintStep($"{ProductionStep.Producing.Stringify()}", robotType.Stringify() + " :");
 
-                var compatibleCore = robotType.GetCompatibleCore();
+                var compatibleCoreType = robotType.GetCompatibleCoreType();
                 DisplayUtils.PrintStep(ProductionStep.GetOutStock.Stringify(),
-                    [compatibleCore.Quantity.ToString(), compatibleCore.Type.Stringify()]);
-                var core = GetOutStock(compatibleCore.Type, inventoryService.PopCoreByType);
-                var supportedSystem = core.Type.GetSupportedSystems().First();
-                DisplayUtils.PrintStep(ProductionStep.Install.Stringify(), [supportedSystem.Stringify(), core.ToString()]);
-                Install(supportedSystem, core);
+                    [compatibleCoreType.Quantity.ToString(), compatibleCoreType.Type.Stringify()]);
+                var core = FindCompatibleCore(robotType, compatibleCoreType.Type);
+
+                var supportedSystemTypes = core.Type.GetSupportedSystemTypes();
+
+                var compatibleSystems = robotType.GetCompatibleSystems();
+
+                var chosenSystem = supportedSystemTypes
+                    .Select(Data.System.Get)
+                    .FirstOrDefault(system => compatibleSystems.Contains(system));
+
+                if (chosenSystem == null)
+                {
+                    CommandLineError.Display($"No compatible system found for robot {robotType.Stringify()} and core {core.Type.Stringify()}");
+                    return;
+                }
+
+                DisplayUtils.PrintStep(ProductionStep.Install.Stringify(), [chosenSystem.ToString(), core.ToString()]);
+                Install(chosenSystem, core);
                 robot.SetCore(core);
 
-                var compatibleGenerator = robotType.GetCompatibleGenerator();
-                DisplayUtils.PrintStep(ProductionStep.GetOutStock.Stringify(), [compatibleGenerator.Quantity.ToString(), compatibleGenerator.Type.Stringify()]);
-                var generator = GetOutStock(compatibleGenerator.Type, inventoryService.PopGeneratorByType);
+                var compatibleGeneratorType = robotType.GetCompatibleGenerator();
+                DisplayUtils.PrintStep(ProductionStep.GetOutStock.Stringify(),
+                    [compatibleGeneratorType.Quantity.ToString(), compatibleGeneratorType.Type.Stringify()]);
+                var generator = FindCompatibleGenerator(robotType, compatibleGeneratorType.Type);
+                robot.SetGenerator(generator);
 
                 var name = "TMP" + (inventoryService.GetAssemblies().Count + 1);
                 DisplayUtils.PrintStep(ProductionStep.Assemble.Stringify(), [name, core.ToString(), generator.ToString()]);
                 var assembly = Assemble(name, generator, core);
                 inventoryService.AddAssembly(assembly);
-                robot.SetGenerator(generator);
 
-                var compatibleArms = robotType.GetCompatibleArms();
-                DisplayUtils.PrintStep(ProductionStep.GetOutStock.Stringify(), [compatibleArms.Quantity.ToString(), compatibleArms.Type.Stringify()]);
-                var arms = GetOutStock(compatibleArms.Type, inventoryService.PopArmsByType);
+                var compatibleArmsType = robotType.GetCompatibleArms();
+                DisplayUtils.PrintStep(ProductionStep.GetOutStock.Stringify(),
+                    [compatibleArmsType.Quantity.ToString(), compatibleArmsType.Type.Stringify()]);
+                var arms = FindCompatibleArms(robotType, compatibleArmsType.Type);
+                robot.SetArms(arms);
 
                 name = "TMP" + (inventoryService.GetAssemblies().Count + 1);
                 DisplayUtils.PrintStep(ProductionStep.Assemble.Stringify(), [name, assembly.Name, arms.ToString()]);
                 assembly = Assemble(name, assembly, arms);
                 inventoryService.AddAssembly(assembly);
-                robot.SetArms(arms);
 
-                var compatibleLegs = robotType.GetCompatibleLegs();
-                DisplayUtils.PrintStep(ProductionStep.GetOutStock.Stringify(), [compatibleLegs.Quantity.ToString(), compatibleLegs.Type.Stringify()]);
-                var legs = GetOutStock(compatibleLegs.Type, inventoryService.PopLegsByType);
+                var compatibleLegsType = robotType.GetCompatibleLegs();
+                DisplayUtils.PrintStep(ProductionStep.GetOutStock.Stringify(),
+                    [compatibleLegsType.Quantity.ToString(), compatibleLegsType.Type.Stringify()]);
+                var legs = FindCompatibleLegs(robotType, compatibleLegsType.Type);
+                robot.SetLegs(legs);
 
                 name = "TMP" + (inventoryService.GetAssemblies().Count + 1);
                 DisplayUtils.PrintStep(ProductionStep.Assemble.Stringify(), [name, assembly.Name, legs.ToString()]);
                 assembly = Assemble(name, assembly, legs);
                 inventoryService.AddAssembly(assembly);
-                robot.SetLegs(legs);
 
                 DisplayUtils.PrintStep(ProductionStep.Finished.Stringify(), robotType.Stringify());
-
                 Console.WriteLine();
             }
         });
     }
+
 
     internal bool Verify(List<Order> orders)
     {
@@ -150,7 +166,7 @@ internal class CommandService(InventoryService inventoryService)
             var robotType = order.RobotType;
             var robotQuantity = order.Quantity;
 
-            var core = robotType.GetCompatibleCore();
+            var core = robotType.GetCompatibleCoreType();
             AddPart(core.Type, robotQuantity * core.Quantity, totalParts);
 
             var generator = robotType.GetCompatibleGenerator();
@@ -200,35 +216,51 @@ internal class CommandService(InventoryService inventoryService)
             {
                 var robot = new Robot(robotType);
 
-                var compatibleCore = robotType.GetCompatibleCore();
-                var core = GetOutStock(compatibleCore.Type, inventoryService.PopCoreByType);
-                var supportedSystem = core.Type.GetSupportedSystems().First();
-                Install(supportedSystem, core);
+                var compatibleCoreType = robotType.GetCompatibleCoreType();
+                var core = FindCompatibleCore(robotType, compatibleCoreType.Type);
+
+                var supportedSystemTypes = core.Type.GetSupportedSystemTypes();
+
+                var compatibleSystems = robotType.GetCompatibleSystems();
+
+                var chosenSystem = supportedSystemTypes
+                    .Select(Data.System.Get)
+                    .FirstOrDefault(system => compatibleSystems.Contains(system));
+
+                if (chosenSystem == null)
+                {
+                    CommandLineError.Display($"No compatible system found for robot {robotType.Stringify()} and core {core.Type.Stringify()}");
+                    return;
+                }
+
+                DisplayUtils.PrintStep(ProductionStep.Install.Stringify(), [chosenSystem.ToString(), core.ToString()]);
+                Install(chosenSystem, core);
                 robot.SetCore(core);
 
-                var compatibleGenerator = robotType.GetCompatibleGenerator();
-                var generator = GetOutStock(compatibleGenerator.Type, inventoryService.PopGeneratorByType);
+
+                var compatibleGeneratorType = robotType.GetCompatibleGenerator();
+                var generator = FindCompatibleGenerator(robotType, compatibleGeneratorType.Type);
+                robot.SetGenerator(generator);
 
                 var name = "TMP" + (inventoryService.GetAssemblies().Count + 1);
                 var assembly = Assemble(name, generator, core);
                 inventoryService.AddAssembly(assembly);
-                robot.SetGenerator(generator);
 
-                var compatibleArms = robotType.GetCompatibleArms();
-                var arms = GetOutStock(compatibleArms.Type, inventoryService.PopArmsByType);
+                var compatibleArmsType = robotType.GetCompatibleArms();
+                var arms = FindCompatibleArms(robotType, compatibleArmsType.Type);
+                robot.SetArms(arms);
 
                 name = "TMP" + (inventoryService.GetAssemblies().Count + 1);
                 assembly = Assemble(name, assembly, arms);
                 inventoryService.AddAssembly(assembly);
-                robot.SetArms(arms);
 
-                var compatibleLegs = robotType.GetCompatibleLegs();
-                var legs = GetOutStock(compatibleLegs.Type, inventoryService.PopLegsByType);
+                var compatibleLegsType = robotType.GetCompatibleLegs();
+                var legs = FindCompatibleLegs(robotType, compatibleLegsType.Type);
+                robot.SetLegs(legs);
 
                 name = "TMP" + (inventoryService.GetAssemblies().Count + 1);
                 assembly = Assemble(name, assembly, legs);
                 inventoryService.AddAssembly(assembly);
-                robot.SetLegs(legs);
 
                 inventoryService.AddRobot(robot);
             }
@@ -254,11 +286,11 @@ internal class CommandService(InventoryService inventoryService)
     }
 
 
-    private void Install(CoreSystem coreSystem, Core core)
+    private void Install(Data.System system, Core core)
     {
         try
         {
-            core.InstallProgram(coreSystem);
+            core.InstallProgram(system);
         }
         catch (InvalidOperationException e)
         {
@@ -276,6 +308,55 @@ internal class CommandService(InventoryService inventoryService)
     private Assembly Assemble<TItem1, TItem2>(string name, TItem1 part1, TItem2 part2)
     {
         return new Assembly(name, part1, part2);
+    }
+
+    private Core FindCompatibleCore(RobotType robotType, CoreType type)
+    {
+        var categories = robotType.GetCompatibleCoreCategories();
+
+        foreach (var category in categories)
+        {
+            var item = inventoryService.GetCoresByType(type).FirstOrDefault(g => g.Category == category);
+            if (item != null)
+                return item;
+        }
+
+        throw new InvalidOperationException($"No compatible Core available for {robotType}");
+    }
+    private Generator FindCompatibleGenerator(RobotType robotType, GeneratorType type)
+    {
+        var categories = robotType.GetCompatibleCoreCategories();
+        foreach (var category in categories)
+        {
+            var item = inventoryService.GetGeneratorsByType(type).FirstOrDefault(g => g.Category == category);
+            if (item != null) return inventoryService.PopGeneratorByType(type);
+        }
+
+        throw new InvalidOperationException("No compatible generator found in stock.");
+    }
+
+    private Arms FindCompatibleArms(RobotType robotType, ArmsType type)
+    {
+        var categories = robotType.GetCompatibleCoreCategories();
+        foreach (var category in categories)
+        {
+            var item = inventoryService.GetArmsByType(type).FirstOrDefault(g => g.Category == category);
+            if (item != null) return inventoryService.PopArmsByType(type);
+        }
+
+        throw new InvalidOperationException("No compatible generator found in stock.");
+    }
+
+    private Legs FindCompatibleLegs(RobotType robotType, LegsType type)
+    {
+        var categories = robotType.GetCompatibleCoreCategories();
+        foreach (var category in categories)
+        {
+            var item = inventoryService.GetLegsByType(type).FirstOrDefault(g => g.Category == category);
+            if (item != null) return inventoryService.PopLegsByType(type);
+        }
+
+        throw new InvalidOperationException("No compatible generator found in stock.");
     }
 
 }

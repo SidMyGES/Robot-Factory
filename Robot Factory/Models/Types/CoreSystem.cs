@@ -2,7 +2,10 @@
 
 internal enum CoreSystem
 {
-    Sb1
+    Sb1,
+    Sm1,
+    Sd1,
+    Si1
 }
 
 internal static class SystemExtensions
@@ -12,7 +15,10 @@ internal static class SystemExtensions
         return system switch
         {
             CoreSystem.Sb1 => "System_SB1",
-            _ => throw new ArgumentOutOfRangeException($"{system} is not supported")
+            CoreSystem.Sm1 => "System_SM1",
+            CoreSystem.Sd1 => "System_SD1",
+            CoreSystem.Si1 => "System_SI1",
+            _ => throw new ArgumentOutOfRangeException(nameof(system), $"{system} is not supported")
         };
     }
 
@@ -21,6 +27,9 @@ internal static class SystemExtensions
         return system switch
         {
             "System_SB1" => CoreSystem.Sb1,
+            "System_SM1" => CoreSystem.Sm1,
+            "System_SD1" => CoreSystem.Sd1,
+            "System_SI1" => CoreSystem.Si1,
             _ => throw new ArgumentException($"{system} is not a valid type of system")
         };
     }

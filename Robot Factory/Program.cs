@@ -45,27 +45,49 @@ internal class Program
 
     public static void FillData(InventoryService inventoryService)
     {
+
+        Data.System.Register(CoreSystem.Sb1, PartCategory.General);    
+        Data.System.Register(CoreSystem.Sm1, PartCategory.Military);   
+        Data.System.Register(CoreSystem.Sd1, PartCategory.Domestic);   
+        Data.System.Register(CoreSystem.Si1, PartCategory.Industrial);
+
+
+        var categories = new[] {
+            PartCategory.Domestic,
+            PartCategory.Industrial,
+            PartCategory.Military,
+            PartCategory.General
+        };
+
+
+
+        foreach (var category in categories)
+        {
+            foreach (var _ in Enumerable.Range(1, 50))
+            {
+                AddItem<CoreType, Core>(
+                    type => new Core(type, category),
+                    inventoryService.AddCore);
+
+                AddItem<ArmsType, Arms>(
+                    type => new Arms(type, category),
+                    inventoryService.AddArms);
+
+                AddItem<LegsType, Legs>(
+                    type => new Legs(type, category),
+                    inventoryService.AddLegs);
+
+                AddItem<GeneratorType, Generator>(
+                    type => new Generator(type, category),
+                    inventoryService.AddGenerator);
+            }
+        }
+
         foreach (var _ in Enumerable.Range(1, 200))
         {
             AddItem<RobotType, Robot>(
                 type => new Robot(type),
                 inventoryService.AddRobot);
-
-            AddItem<CoreType, Core>(
-                type => new Core(type),
-                inventoryService.AddCore);
-
-            AddItem<ArmsType, Arms>(
-                type => new Arms(type),
-                inventoryService.AddArms);
-
-            AddItem<LegsType, Legs>(
-                type => new Legs(type),
-                inventoryService.AddLegs);
-
-            AddItem<GeneratorType, Generator>(
-                type => new Generator(type),
-                inventoryService.AddGenerator);
         }
     }
 }

@@ -20,7 +20,7 @@ internal static class CoreTypeExtension
         };
     }
 
-    public static List<CoreSystem> GetSupportedSystems(this CoreType type)
+    public static List<CoreSystem> GetSupportedSystemTypes(this CoreType type)
     {
         return type switch
         {

@@ -1,4 +1,6 @@
-﻿namespace Robot_Factory.Models.Types;
+﻿using Robot_Factory.Validation;
+
+namespace Robot_Factory.Models.Types;
 
 internal enum RobotType
 {
@@ -32,7 +34,7 @@ internal static class RobotTypeExtension
         };
     }
 
-    public static PartInfo<CoreType> GetCompatibleCore(this RobotType type)
+    public static PartInfo<CoreType> GetCompatibleCoreType(this RobotType type)
     {
         return type switch
         {
@@ -77,6 +79,35 @@ internal static class RobotTypeExtension
             RobotType.Wi1 => new PartInfo<LegsType>(LegsType.Li1, 1),
             _ => throw new ArgumentOutOfRangeException($"{type} is not a declared robot type")
         };
+    }
+
+    public static PartCategory GetRobotCategory(this RobotType type)
+    {
+        return type switch
+        {
+            RobotType.Xm1 => PartCategory.Military,
+            RobotType.Rd1 => PartCategory.Domestic,
+            RobotType.Wi1 => PartCategory.Industrial,
+            _ => throw new ArgumentOutOfRangeException($"{type} is not a declared robot type")
+        };
+    }
+
+    public static List<PartCategory> GetCompatibleCoreCategories(this RobotType type)
+    {
+        var strategy = CompatibilityStrategyFactory.Get(type.GetRobotCategory());
+        return new List<PartCategory> {
+            PartCategory.Military,
+            PartCategory.Domestic,
+            PartCategory.Industrial,
+        }.Where(c => strategy.IsCompatiblePart(c)).ToList();
+    }
+
+    public static List<Data.System> GetCompatibleSystems(this RobotType type)
+    {
+        var strategy = CompatibilityStrategyFactory.Get(type.GetRobotCategory());
+        return Data.System.GetAll()
+            .Where(system => strategy.IsCompatibleSystem(system))
+            .ToList();
     }
 
 }
