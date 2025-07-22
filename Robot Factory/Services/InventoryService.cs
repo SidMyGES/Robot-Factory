@@ -85,7 +85,7 @@ internal class InventoryService
         _inventory.GeneratorInventory.Add(generator);
     }
 
-    public Robot? PopRobotByType(RobotType type)
+    public Robot? PopRobotByTypeAndCategory(RobotType type)
     {
         var robot = _inventory.RobotInventory.FirstOrDefault(robot => robot.Type == type);
         if (robot != null)
@@ -96,9 +96,9 @@ internal class InventoryService
         return robot;
     }
 
-    public Core PopCoreByType(CoreType type)
+    public Core PopCoreByTypeAndCategory(CoreType type, PartCategory category)
     {
-        var core = _inventory.CoreInventory.FirstOrDefault(core => core.Type == type);
+        var core = _inventory.CoreInventory.FirstOrDefault(core => core.Type == type && core.Category == category);
         if (core != null)
         {
             _inventory.CoreInventory.Remove(core);
@@ -112,9 +112,9 @@ internal class InventoryService
         return core;
     }
 
-    public Generator PopGeneratorByType(GeneratorType type)
+    public Generator PopGeneratorByTypeAndCategory(GeneratorType type, PartCategory category)
     {
-        var generator = _inventory.GeneratorInventory.FirstOrDefault(generator => generator.Type == type);
+        var generator = _inventory.GeneratorInventory.FirstOrDefault(generator => generator.Type == type && generator.Category == category);
         if (generator != null)
         {
             _inventory.GeneratorInventory.Remove(generator);
@@ -128,9 +128,9 @@ internal class InventoryService
         return generator;
     }
 
-    public Arms PopArmsByType(ArmsType type)
+    public Arms PopArmsByTypeAndCategory(ArmsType type, PartCategory category)
     {
-        var arm = _inventory.ArmInventory.FirstOrDefault(arm => arm.Type == type);
+        var arm = _inventory.ArmInventory.FirstOrDefault(arm => arm.Type == type && arm.Category == category);
         if (arm != null)
         {
             _inventory.ArmInventory.Remove(arm);
@@ -144,9 +144,9 @@ internal class InventoryService
         return arm;
     }
 
-    public Legs PopLegsByType(LegsType type)
+    public Legs PopLegsByTypeAndCategory(LegsType type, PartCategory category)
     {
-        var leg = _inventory.LegInventory.FirstOrDefault(leg => leg.Type == type);
+        var leg = _inventory.LegInventory.FirstOrDefault(leg => leg.Type == type && leg.Category == category);
         if (leg != null)
         {
             _inventory.LegInventory.Remove(leg);
@@ -173,5 +173,10 @@ internal class InventoryService
     public List<Assembly> GetAssemblies()
     {
         return _inventory.AssemblyInventory;
+    }
+
+    public void ClearAssemblies()
+    {
+        _inventory.AssemblyInventory.Clear();
     }
 }
